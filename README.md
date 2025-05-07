@@ -10,6 +10,7 @@ A lightweight JSON schema validation library for JavaScript that can be used in 
 - Supports common validation types and formats
 - Comprehensive error reporting
 - Small footprint
+- Strict validation with additional properties control
 
 ## Installation
 
@@ -67,6 +68,74 @@ if (result.isValid) {
 }
 ```
 
+### Additional Properties Control
+
+By default, the library rejects any properties not defined in the schema:
+
+```javascript
+// Schema only defines name and email
+const schema = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    email: { type: 'string' }
+  }
+};
+
+// Data contains an extra property 'age'
+const data = {
+  name: 'John Doe',
+  email: 'john@example.com',
+  age: 30  // This will cause validation failure
+};
+
+const result = validate(data, schema);
+// result.isValid will be false
+// result.errors will contain an error about 'age' being an additional property
+```
+
+To allow additional properties, set `additionalProperties` to `true`:
+
+```javascript
+const schema = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    email: { type: 'string' }
+  },
+  additionalProperties: true  // Allow any additional properties
+};
+
+// Now this will pass validation
+const data = {
+  name: 'John Doe',
+  email: 'john@example.com',
+  age: 30  // This is now allowed
+};
+```
+
+You can also provide a schema for additional properties:
+
+```javascript
+const schema = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    email: { type: 'string' }
+  },
+  // All additional properties must be numbers
+  additionalProperties: { type: 'number' }
+};
+
+// This will pass validation
+const data = {
+  name: 'John Doe',
+  email: 'john@example.com',
+  age: 30,  // Valid additional property (number)
+  score: 95  // Valid additional property (number)
+};
+```
+
 ### Validation Result
 
 The validation result contains:
@@ -102,6 +171,7 @@ The validation result contains:
 
 - `properties` - schema for each property
 - `required` - list of required properties
+- `additionalProperties` - controls whether properties not defined in the schema are allowed
 
 ### Array Validations
 
@@ -132,9 +202,11 @@ Schemas should follow a simplified JSON Schema format. Here's an example of a mo
       "properties": {
         "created": { "type": "string", "format": "date-time" },
         "status": { "enum": ["active", "inactive", "pending"] }
-      }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "additionalProperties": false  // No additional root properties allowed
 }
 ```
 

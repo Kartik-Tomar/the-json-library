@@ -10,6 +10,35 @@ const validateAgainstSchema = (data, schema, path, errors) => {
     return false;
   }
 
+  // Check for additional properties
+  if (schema.type === "object" && typeof data === "object" && data !== null) {
+    // By default, reject additional properties unless additionalProperties is true
+    const additionalPropsAllowed = schema.additionalProperties !== undefined 
+      ? schema.additionalProperties 
+      : false;
+    
+    if (!additionalPropsAllowed) {
+      const schemaProps = schema.properties ? Object.keys(schema.properties) : [];
+      for (const key in data) {
+        if (!schemaProps.includes(key)) {
+          errors.push({
+            path: path ? `${path}.${key}` : key,
+            message: `Additional property '${key}' is not allowed`,
+          });
+        }
+      }
+    } else if (typeof schema.additionalProperties === 'object') {
+      // If additionalProperties is an object (schema), validate additional properties against it
+      const schemaProps = schema.properties ? Object.keys(schema.properties) : [];
+      for (const key in data) {
+        if (!schemaProps.includes(key)) {
+          const propPath = path ? `${path}.${key}` : key;
+          validateAgainstSchema(data[key], schema.additionalProperties, propPath, errors);
+        }
+      }
+    }
+  }
+
   // Required properties validation
   if (schema.required && Array.isArray(schema.required)) {
     for (const prop of schema.required) {

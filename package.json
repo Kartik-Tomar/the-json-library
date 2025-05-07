@@ -1,6 +1,6 @@
 {
   "name": "the-json-library",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "main": "dist/the-json-library.cjs.js",
   "module": "dist/the-json-library.esm.js",
   "browser": "dist/the-json-library.umd.js",
@@ -27,5 +27,12 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "rollup": "^2.79.2",
     "rollup-plugin-terser": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kartik-Tomar/the-json-library"
+  },
+  "bugs": {
+    "url": "https://github.com/Kartik-Tomar/the-json-library/issues"
   }
 }
